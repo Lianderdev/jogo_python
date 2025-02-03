@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const botaoComecarPartida = document.getElementById('comecar-partida');
     const botaoVoltarInicio = document.getElementById('voltar-inicio');
     const botaoVoltarSelecao = document.getElementById('voltar-selecao');
-    const botaoVoltarRanking = document.getElementById('voltar-ranking');
     const botaoVoltarJogo = document.getElementById('voltar-jogo');
     const personagens = document.querySelectorAll('.personagem');
     const nomeJogador = document.getElementById('nome-jogador');
@@ -19,13 +18,118 @@ document.addEventListener('DOMContentLoaded', () => {
     const pontuacaoElement = document.getElementById('pontuacao');
     const vidasElement = document.getElementById('vidas');
 
-    let personagemSelecionado = null;
-    let ranking = JSON.parse(localStorage.getItem('ranking')) || [];
+    const tamanhoCelula = 20; // Tamanho de cada célula (20x20 pixels)
+    const larguraMapa = 21; // Número de colunas
+    const alturaMapa = 18; // Número de linhas
+
+    // Matriz do mapa
+    const mapa = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0],
+        [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+        [0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 3, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 1, 1, 1, 1, 0, 3, 3, 3, 0, 1, 1, 1, 1, 1, 0, 1, 0],
+        [0, 1, 1, 1, 1, 1, 1, 1, 0, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+        [0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 0],
+        [0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0],
+        [0, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+    ];
+
+    let personagem = { x: 10, y: 1, direcao: 'direita' }; // Spawn do jogador (linha 1, coluna 10)
+    let inimigos = [];
+    let moedas = [];
+    let powerUps = [];
     let pontuacao = 0;
     let vidas = 3;
     let powerUpAtivo = false;
     let tempoPowerUp = 0;
 
+    // Inicializar moedas e power-ups
+    for (let y = 0; y < alturaMapa; y++) {
+        for (let x = 0; x < larguraMapa; x++) {
+            if (mapa[y][x] === 1) {
+                moedas.push({ x, y });
+            } else if (mapa[y][x] === 2) {
+                powerUps.push({ x, y });
+            } else if (mapa[y][x] === 3) {
+                inimigos.push({ x, y, direcao: 'parado', estado: 'normal' });
+            }
+        }
+    }
+
+    // Função para desenhar o mapa
+    function desenharMapa() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let y = 0; y < alturaMapa; y++) {
+            for (let x = 0; x < larguraMapa; x++) {
+                if (mapa[y][x] === 0) {
+                    ctx.fillStyle = 'blue'; // Obstáculos
+                } else if (mapa[y][x] === 1 || mapa[y][x] === 4) {
+                    ctx.fillStyle = 'black'; // Caminhos
+                } else if (mapa[y][x] === 2) {
+                    ctx.fillStyle = 'yellow'; // Power-ups
+                } else if (mapa[y][x] === 3) {
+                    ctx.fillStyle = 'red'; // Spawn dos inimigos
+                }
+                ctx.fillRect(x * tamanhoCelula, y * tamanhoCelula, tamanhoCelula, tamanhoCelula);
+            }
+        }
+    }
+
+    // Função para desenhar o jogador
+    function desenharJogador() {
+        ctx.fillStyle = 'green';
+        ctx.beginPath();
+        ctx.arc(
+            personagem.x * tamanhoCelula + tamanhoCelula / 2,
+            personagem.y * tamanhoCelula + tamanhoCelula / 2,
+            tamanhoCelula / 2,
+            0,
+            Math.PI * 2
+        );
+        ctx.fill();
+    }
+
+    // Função para desenhar inimigos
+    function desenharInimigos() {
+        ctx.fillStyle = 'red';
+        inimigos.forEach(inimigo => {
+            ctx.fillRect(inimigo.x * tamanhoCelula, inimigo.y * tamanhoCelula, tamanhoCelula, tamanhoCelula);
+        });
+    }
+
+    // Função para desenhar moedas
+    function desenharMoedas() {
+        ctx.fillStyle = 'white';
+        moedas.forEach(moeda => {
+            ctx.beginPath();
+            ctx.arc(
+                moeda.x * tamanhoCelula + tamanhoCelula / 2,
+                moeda.y * tamanhoCelula + tamanhoCelula / 2,
+                5,
+                0,
+                Math.PI * 2
+            );
+            ctx.fill();
+        });
+    }
+
+    // Função para desenhar power-ups
+    function desenharPowerUps() {
+        ctx.fillStyle = 'yellow';
+        powerUps.forEach(powerUp => {
+            ctx.fillRect(powerUp.x * tamanhoCelula, powerUp.y * tamanhoCelula, tamanhoCelula, tamanhoCelula);
+        });
+    }
     // Navegação entre telas
     botaoJogar.addEventListener('click', () => {
         telaInicial.style.display = 'none';
@@ -52,11 +156,6 @@ document.addEventListener('DOMContentLoaded', () => {
         telaInicial.style.display = 'block';
     });
 
-    botaoVoltarRanking.addEventListener('click', () => {
-        telaRanking.style.display = 'none';
-        telaInicial.style.display = 'block';
-    });
-
     botaoVoltarJogo.addEventListener('click', () => {
         telaJogo.style.display = 'none';
         telaInicial.style.display = 'block';
@@ -68,6 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
             personagens.forEach(p => p.classList.remove('selecionado'));
             personagem.classList.add('selecionado');
             personagemSelecionado = personagem.getAttribute('data-personagem');
+            console.log(`Personagem selecionado: ${personagemSelecionado}`); // Debugging
         });
     });
 
