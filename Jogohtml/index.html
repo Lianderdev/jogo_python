@@ -1,68 +1,76 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pacman-like Game</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
     <!-- Tela Inicial -->
     <div id="tela-inicial" class="tela">
         <h1 class="title">Pacman-like Game</h1>
         <div class="img-fundo">
-            <img src="/jogo_python/Jogohtml/assets/Capa.png" alt="">
+            <img src="assets/Capa.png" alt="">
         </div>
         <div class="botões-tela-inicial">
-            <button id="jogar">Jogar</button>
-            <button id="ranking">Ranking</button>
-            <button id="sair">Sair</button>
+            <button id="jogar">Jogar<i class="fa-solid fa-gamepad"></i></button>
+            <button id="ranking">Ranking<i class="fa-solid fa-ranking-star"></i></button>
+            <button id="sair">Sair<i class="fa-solid fa-door-open"></i></button>
         </div>
     </div>
 
     <!-- Tela de Seleção de Personagem -->
-<div id="tela-selecao" class="tela" style="display: none;">
-    <button id="voltar-selecao" class="botao-voltar">←</button>
-    <h1 class="title">Escolha seu Personagem</h1>
-    <div id="personagens">
-        <div class="personagem" data-personagem="1">
-            <img src="personagem1.png" alt="Personagem 1">
+    <div id="tela-selecao" class="tela" style="display: none;">
+        <button id="voltar-selecao" class="botao-voltar"><i class="fa-solid fa-arrow-left"></i></button>
+        <h1 class="title">Escolha seu Personagem</h1>
+        <div id="personagens">
+            <div class="personagem" data-personagem="1">
+                <img src="personagem1.png" alt="Personagem 1">
+            </div>
+            <div class="personagem" data-personagem="2">
+                <img src="personagem2.png" alt="Personagem 2">
+            </div>
         </div>
-        <div class="personagem" data-personagem="2">
-            <img src="personagem2.png" alt="Personagem 2">
+        <input type="text" id="nome-jogador" placeholder="Digite seu nome">
+        <button id="comecar-partida">Começar a Partida <i class="fa-solid fa-play"></i></button>
+    </div>
+
+    <!-- Tela de Ranking -->
+    <div id="tela-ranking" class="tela" style="display: none;">
+        <h1 class="title">Ranking</h1>
+        <table id="tabela-ranking">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Pontuação</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Aqui serão inseridas as linhas do ranking dinamicamente -->
+            </tbody>
+        </table>
+        <button id="voltar-inicio">Voltar ao Início</button>
+    </div>
+
+    <!-- Tela do Jogo -->
+    <div id="tela-jogo" class="tela" style="display: none;">
+        <button id="voltar-jogo" class="botao-voltar">←</button>
+        <div id="info-jogo">
+            <span id="pontuacao">Pontuação: 0</span>
+            <span id="vidas">❤️❤️❤️</span>
         </div>
+        <canvas id="canvas-jogo" width="600" height="400"></canvas>
     </div>
-    <input type="text" id="nome-jogador" placeholder="Digite seu nome">
-    <button id="comecar-partida">Começar a Partida</button>
-</div>
-
-<!-- Tela de Ranking -->
-<div id="tela-ranking" class="tela" style="display: none;">
-    <button id="voltar-ranking" class="botao-voltar">←</button>
-    <h1 class="title">Ranking</h1>
-    <table id="tabela-ranking">
-        <thead>
-            <tr>
-                <th>Nome</th>
-                <th>Pontuação</th>
-            </tr>
-        </thead>
-        <tbody>
-            <!-- Aqui serão inseridas as linhas do ranking dinamicamente -->
-        </tbody>
-    </table>
-    <button id="voltar-inicio">Voltar ao Início</button>
-</div>
-
-<!-- Tela do Jogo -->
-<div id="tela-jogo" class="tela" style="display: none;">
-    <button id="voltar-jogo" class="botao-voltar">←</button>
-    <div id="info-jogo">
-        <span id="pontuacao">Pontuação: 0</span>
-        <span id="vidas">❤️❤️❤️</span>
-    </div>
-    <canvas id="canvas-jogo" width="600" height="400"></canvas>
-</div>
     <script src="script.js"></script>
 </body>
+
 </html>
