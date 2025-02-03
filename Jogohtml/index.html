@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pacman-like Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Tela Inicial -->
+    <div id="tela-inicial" class="tela">
+        <h1>Pacman-like Game</h1>
+        <button id="jogar">Jogar</button>
+        <button id="ranking">Ranking</button>
+        <button id="sair">Sair</button>
+    </div>
+
+    <!-- Tela de Seleção de Personagem -->
+<div id="tela-selecao" class="tela" style="display: none;">
+    <button id="voltar-selecao" class="botao-voltar">←</button>
+    <h2>Escolha seu Personagem</h2>
+    <div id="personagens">
+        <div class="personagem" data-personagem="1">
+            <img src="personagem1.png" alt="Personagem 1">
+        </div>
+        <div class="personagem" data-personagem="2">
+            <img src="personagem2.png" alt="Personagem 2">
+        </div>
+    </div>
+    <input type="text" id="nome-jogador" placeholder="Digite seu nome">
+    <button id="comecar-partida">Começar a Partida</button>
+</div>
+
+<!-- Tela de Ranking -->
+<div id="tela-ranking" class="tela" style="display: none;">
+    <button id="voltar-ranking" class="botao-voltar">←</button>
+    <h2>Ranking</h2>
+    <table id="tabela-ranking">
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Pontuação</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Aqui serão inseridas as linhas do ranking dinamicamente -->
+        </tbody>
+    </table>
+    <button id="voltar-inicio">Voltar ao Início</button>
+</div>
+
+<!-- Tela do Jogo -->
+<div id="tela-jogo" class="tela" style="display: none;">
+    <button id="voltar-jogo" class="botao-voltar">←</button>
+    <div id="info-jogo">
+        <span id="pontuacao">Pontuação: 0</span>
+        <span id="vidas">❤️❤️❤️</span>
+    </div>
+    <canvas id="canvas-jogo" width="600" height="400"></canvas>
+</div>
+    <script src="script.js"></script>
+</body>
+</html>
