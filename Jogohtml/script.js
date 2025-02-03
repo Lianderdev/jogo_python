@@ -100,41 +100,44 @@ document.addEventListener('DOMContentLoaded', () => {
         const larguraMapa = canvas.width / tamanhoCelula;
         const alturaMapa = canvas.height / tamanhoCelula;
         let personagem = { x: 1, y: 1, direcao: 'direita' };
-        let moedas = [];
-        let inimigos = [];
-        let powerUps = [];
-        let intervaloInimigos;
+        const moedas = [];
+        const inimigos = [];
+        const blocos = [];
 
-        // Inicializar moedas
+        // Criar blocos (colisores verdes)
+        for (let i = 0; i < larguraMapa; i++) {
+            for (let j = 0; j < alturaMapa; j++) {
+                if (i === 0 || i === larguraMapa - 1 || j === 0 || j === alturaMapa - 1) {
+                    blocos.push({ x: i, y: j }); // Bordas do mapa
+                } else if (Math.random() < 0.1 && !(i === 1 && j === 1)) { // Obstáculos internos
+                    blocos.push({ x: i, y: j });
+                }
+            }
+        }
+
+        // Criar moedas
         for (let i = 1; i < larguraMapa - 1; i++) {
             for (let j = 1; j < alturaMapa - 1; j++) {
-                if (Math.random() > 0.8) {
+                if (!blocos.some(bloco => bloco.x === i && bloco.y === j)) {
                     moedas.push({ x: i, y: j });
                 }
             }
         }
 
-        // Inicializar inimigos
+        // Criar inimigos
         for (let i = 0; i < 4; i++) {
-            inimigos.push({ x: Math.floor(Math.random() * larguraMapa), y: Math.floor(Math.random() * alturaMapa), estado: 'normal' });
+            inimigos.push({ x: Math.floor(Math.random() * larguraMapa), y: Math.floor(Math.random() * alturaMapa), direcao: ['cima', 'baixo', 'esquerda', 'direita'][Math.floor(Math.random() * 4)], estado: 'normal' });
         }
-
-        // Inicializar power-ups
-        powerUps.push({ x: Math.floor(larguraMapa / 2), y: Math.floor(alturaMapa / 2) });
 
         // Função para desenhar o jogo
         function desenharJogo() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // Desenhar blocos verdes (colisores)
+            // Desenhar blocos
             ctx.fillStyle = 'green';
-            for (let i = 0; i < larguraMapa; i++) {
-                for (let j = 0; j < alturaMapa; j++) {
-                    if (i === 0 || i === larguraMapa - 1 || j === 0 || j === alturaMapa - 1) {
-                        ctx.fillRect(i * tamanhoCelula, j * tamanhoCelula, tamanhoCelula, tamanhoCelula);
-                    }
-                }
-            }
+            blocos.forEach(bloco => {
+                ctx.fillRect(bloco.x * tamanhoCelula, bloco.y * tamanhoCelula, tamanhoCelula, tamanhoCelula);
+            });
 
             // Desenhar moedas
             ctx.fillStyle = 'orange';
@@ -142,12 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.beginPath();
                 ctx.arc(moeda.x * tamanhoCelula + tamanhoCelula / 2, moeda.y * tamanhoCelula + tamanhoCelula / 2, 5, 0, Math.PI * 2);
                 ctx.fill();
-            });
-
-            // Desenhar power-ups
-            ctx.fillStyle = 'blue';
-            powerUps.forEach(powerUp => {
-                ctx.fillRect(powerUp.x * tamanhoCelula, powerUp.y * tamanhoCelula, tamanhoCelula, tamanhoCelula);
             });
 
             // Desenhar personagem
@@ -161,9 +158,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 ctx.fillStyle = inimigo.estado === 'normal' ? 'red' : 'blue';
                 ctx.fillRect(inimigo.x * tamanhoCelula, inimigo.y * tamanhoCelula, tamanhoCelula, tamanhoCelula);
             });
+        }
 
-            // Verificar colisões
-            verificarColisoes();
+        // Função para mover inimigos
+        function moverInimigos() {
+            inimigos.forEach(inimigo => {
+                const direcoes = ['cima', 'baixo', 'esquerda', 'direita'];
+                const novaDirecao = direcoes[Math.floor(Math.random() * 4)];
+                inimigo.direcao = novaDirecao;
+
+                let novoX = inimigo.x;
+                let novoY = inimigo.y;
+
+                if (inimigo.direcao === 'cima') novoY--;
+                if (inimigo.direcao === 'baixo') novoY++;
+                if (inimigo.direcao === 'esquerda') novoX--;
+                if (inimigo.direcao === 'direita') novoX++;
+
+                if (!blocos.some(bloco => bloco.x === novoX && bloco.y === novoY)) {
+                    inimigo.x = novoX;
+                    inimigo.y = novoY;
+                }
+            });
         }
 
         // Função para verificar colisões
@@ -174,14 +190,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     moedas.splice(index, 1);
                     pontuacao += 10;
                     pontuacaoElement.textContent = `Pontuação: ${pontuacao}`;
-                }
-            });
-
-            // Colisão com power-ups
-            powerUps.forEach((powerUp, index) => {
-                if (powerUp.x === personagem.x && powerUp.y === personagem.y) {
-                    powerUps.splice(index, 1);
-                    ativarPowerUp();
                 }
             });
 
@@ -204,17 +212,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Função para ativar o power-up
-        function ativarPowerUp() {
-            powerUpAtivo = true;
-            tempoPowerUp = 8;
-            inimigos.forEach(inimigo => inimigo.estado = 'assustado');
-            setTimeout(() => {
-                powerUpAtivo = false;
-                inimigos.forEach(inimigo => inimigo.estado = 'normal');
-            }, 8000);
-        }
-
         // Função para finalizar o jogo
         function finalizarJogo() {
             ranking.push({ nome: nomeJogador.value, pontuacao });
@@ -223,9 +220,27 @@ document.addEventListener('DOMContentLoaded', () => {
             telaInicial.style.display = 'block';
         }
 
+        // Controles do teclado
+        document.addEventListener('keydown', (e) => {
+            let novoX = personagem.x;
+            let novoY = personagem.y;
+
+            if (e.key === 'ArrowUp' || e.key === 'w') novoY--;
+            if (e.key === 'ArrowDown' || e.key === 's') novoY++;
+            if (e.key === 'ArrowLeft' || e.key === 'a') novoX--;
+            if (e.key === 'ArrowRight' || e.key === 'd') novoX++;
+
+            if (!blocos.some(bloco => bloco.x === novoX && bloco.y === novoY)) {
+                personagem.x = novoX;
+                personagem.y = novoY;
+            }
+        });
+
         // Loop do jogo
         function loopJogo() {
             desenharJogo();
+            moverInimigos();
+            verificarColisoes();
             requestAnimationFrame(loopJogo);
         }
 
