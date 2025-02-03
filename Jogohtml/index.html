@@ -9,16 +9,21 @@
 <body>
     <!-- Tela Inicial -->
     <div id="tela-inicial" class="tela">
-        <h1>Pacman-like Game</h1>
-        <button id="jogar">Jogar</button>
-        <button id="ranking">Ranking</button>
-        <button id="sair">Sair</button>
+        <h1 class="title">Pacman-like Game</h1>
+        <div class="img-fundo">
+            <img src="" alt="">
+        </div>
+        <div class="botões-tela-inicial">
+            <button id="jogar">Jogar</button>
+            <button id="ranking">Ranking</button>
+            <button id="sair">Sair</button>
+        </div>
     </div>
 
     <!-- Tela de Seleção de Personagem -->
 <div id="tela-selecao" class="tela" style="display: none;">
     <button id="voltar-selecao" class="botao-voltar">←</button>
-    <h2>Escolha seu Personagem</h2>
+    <h1 class="title">Escolha seu Personagem</h1>
     <div id="personagens">
         <div class="personagem" data-personagem="1">
             <img src="personagem1.png" alt="Personagem 1">
@@ -34,7 +39,7 @@
 <!-- Tela de Ranking -->
 <div id="tela-ranking" class="tela" style="display: none;">
     <button id="voltar-ranking" class="botao-voltar">←</button>
-    <h2>Ranking</h2>
+    <h1 class="title">Ranking</h1>
     <table id="tabela-ranking">
         <thead>
             <tr>
